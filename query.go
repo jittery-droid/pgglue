@@ -16,6 +16,13 @@ func (q *Query) S() string {
 	return q.statement + ";"
 }
 
+// Join adds a join from the current query to a provided table using
+// a particular mapping.
+func (q *Query) Join(table, mapping string) *Query {
+	q.statement += fmt.Sprintf(" join %s on %s", table, mapping)
+	return q
+}
+
 // Where adds a clause to an existing query's statement. The arguments
 // required are the column being evaluated and the type of expression to use (>, <, =)
 func (q *Query) Where(column, expression string) *Query {
@@ -51,7 +58,7 @@ func Select(table string, columns ...[]string) *Query {
 
 	var statement string
 	if len(columns) == 0 {
-		statement = "select * "
+		statement = "select *"
 	}
 
 	if statement == "" {

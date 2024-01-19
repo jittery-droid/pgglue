@@ -24,3 +24,33 @@ func Test_Insert(t *testing.T) {
 	assert.NotNil(t, q)
 	assert.Equal(t, "insert into books (author, publisher, publish_date) values ($1, $2, $3);", q.S())
 }
+
+func Test_Update(t *testing.T) {
+	q := Update("books", []string{"author", "publisher", "publish_date"})
+	assert.NotNil(t, q)
+	assert.Equal(t, "update books set ( author = $1, publisher = $2, publish_date = $3 );", q.S())
+}
+
+func Test_Where(t *testing.T) {
+	q := Update("books", []string{"author", "publisher", "publish_date"})
+	assert.NotNil(t, q)
+	assert.Equal(t, "update books set ( author = $1, publisher = $2, publish_date = $3 )", q.statement)
+	q = q.Where("author", "=")
+	assert.Equal(t, "update books set ( author = $1, publisher = $2, publish_date = $3 ) where author = $4;", q.S())
+}
+
+func Test_Returning(t *testing.T) {
+	columns := []string{"author", "publisher", "publish_date"}
+	q := Update("books", columns).
+		Where("author", "=").
+		Returning(columns)
+	assert.NotNil(t, q)
+	statement := "update books set ( author = $1, publisher = $2, publish_date = $3 ) where author = $4 returning ( author, publisher, publish_date );"
+	assert.Equal(t, statement, q.S())
+}
+
+func Test_Limit(t *testing.T) {
+	q := Select("books").Limit(50)
+	assert.NotNil(t, q)
+	assert.Equal(t, "select *  from books limit 50;", q.S())
+}
